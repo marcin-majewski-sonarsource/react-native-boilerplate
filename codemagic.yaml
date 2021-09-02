@@ -1,0 +1,34 @@
+workflows:
+  build:
+    name: Sonar
+    environment:
+      vars:
+        SONAR_TOKEN: Encrypted(Z0FBQUFBQmhNSUlMOFJxTk1FY1JaZDZ3QXJ6c3oyUklQUXM1OHJaejFWOTNXbjBad1ZpSWhwNWpiNkR5YnJZRTdFczlLekwzRWZEMXRNbXA5TU1jbGg5Wjk1eWkyQnFENW8tMEFxbkM3WHdOcTdMNGtFZFBjcW9nOXNvQW9VeklJM1hWakpMVkxvTHI=)
+        SONAR_ORG_KEY: marcin-majewski-sonarsource-1
+        SONAR_PROJECT_KEY: marcin-majewski-sonarsource_react-native-boilerplate
+    triggering:
+      events:
+        - push
+        - pull_request
+      branch_patterns:
+        - pattern: '*'
+          include: true
+          source: true
+      tag_patterns:
+        - pattern: '*'
+          include: true
+    scripts:
+      - |
+        # download and install SonarQube
+        wget -O $FCI_BUILD_DIR/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170-macosx.zip
+        unzip $FCI_BUILD_DIR/sonar-scanner.zip
+        mv sonar-scanner-* sonar-scanner
+      - |
+        # Generate and upload code analysis report
+        export PATH=$PATH:$FCI_BUILD_DIR/sonar-scanner/bin
+        sonar-scanner \
+        -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+        -Dsonar.organization=$SONAR_ORG_KEY \
+        -Dsonar.host.url=https://mmsc.eu.ngrok.io \
+        -Dsonar.login=$SONAR_TOKEN \
+        -Dsonar.sources=.
